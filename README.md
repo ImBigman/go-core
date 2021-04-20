@@ -1,0 +1,2 @@
+# go-core
+education projects
