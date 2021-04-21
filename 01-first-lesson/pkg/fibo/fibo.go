@@ -1,24 +1,13 @@
-// Package fibo формирует массив чисел и выводит значения по индексу.
+// Package fibo формирует массив чисел и выводит значения по порядковому номеру.
 package fibo
 
-import "fmt"
+func Numbers(x int, y int) int {
+	a := make([]int, x, x)
+	a[0], a[1] = 0, 1
 
-func FiboNumbers(n int) {
-	var fiboArray [20]int = [20]int{0, 1}
-
-	for i := 2; i < 20; i++ {
-		fiboArray[i] = fiboArray[i-1] + fiboArray[i-2]
+	for i := 2; i < x; i++ {
+		a[i] = a[i-1] + a[i-2]
 	}
 
-	printFibo(n, fiboArray)
-
-}
-
-func printFibo(x int, y [20]int) {
-	if 0 < x && x <= 20 {
-		fmt.Println(y[x-1])
-	} else {
-		fmt.Println("Недопустимое значение")
-	}
-
+	return a[y-1]
 }
