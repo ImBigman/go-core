@@ -1,13 +1,15 @@
-// Package fibo формирует массив чисел и выводит значения по порядковому номеру.
+// Package fibo возвращает значения по порядковому номеру.
 package fibo
 
-func Numbers(x int, y int) int {
-	a := make([]int, x, x)
-	a[0], a[1] = 0, 1
+// f - порядковый номер искомого значения из ряда
+func Num(f int) int {
+	b, c := 0, 1
 
-	for i := 2; i < x; i++ {
-		a[i] = a[i-1] + a[i-2]
+	for i := 0; i <= f-2; i++ {
+		var d = c
+		c = b + c
+		b = d
 	}
 
-	return a[y-1]
+	return b
 }
