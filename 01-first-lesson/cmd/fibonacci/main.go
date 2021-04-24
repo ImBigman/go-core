@@ -8,20 +8,18 @@ import (
 func main() {
 	var d, e = 8, 19
 
-	print(d)
-	print(e)
-	print(-1)
-	print(22)
+	resultFor(d)
+	resultFor(e)
+	resultFor(-1)
+	resultFor(22)
 }
 
-// print - выводит на экран результат или предупреждения
+// resultFor - выводит на экран результат или предупреждения
 // с - порядковый номер
-func print(c int) {
-
+func resultFor(c int) {
 	if 0 < c && c <= 20 {
 		fmt.Println(fibo.Num(c))
 	} else {
 		fmt.Println("Недопустимое значение")
 	}
-
 }

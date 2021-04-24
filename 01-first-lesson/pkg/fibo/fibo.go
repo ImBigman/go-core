@@ -6,9 +6,7 @@ func Num(f int) int {
 	b, c := 0, 1
 
 	for i := 0; i <= f-2; i++ {
-		var d = c
-		c = b + c
-		b = d
+		b, c = c, b+c
 	}
 
 	return b
