@@ -8,15 +8,15 @@ import (
 func main() {
 	var d, e = 8, 19
 
-	printFiboNUm(d)
-	printFiboNUm(e)
-	printFiboNUm(-1)
-	printFiboNUm(22)
+	printFiboNum(d)
+	printFiboNum(e)
+	printFiboNum(-1)
+	printFiboNum(22)
 }
 
-// printFiboNUm - выводит на экран результат или предупреждения
+// printFiboNum - выводит на экран результат или предупреждения
 // с - порядковый номер
-func printFiboNUm(c int) {
+func printFiboNum(c int) {
 	if 0 < c && c <= 20 {
 		fmt.Println(fibo.Num(c))
 	} else {
