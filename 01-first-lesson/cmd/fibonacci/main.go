@@ -6,20 +6,12 @@ import (
 )
 
 func main() {
-	var d, e = 8, 19
-
-	printFiboNUm(d)
-	printFiboNUm(e)
-	printFiboNUm(-1)
-	printFiboNUm(22)
-}
-
-// printFiboNUm - выводит на экран результат или предупреждения
-// с - порядковый номер
-func printFiboNUm(c int) {
-	if 0 < c && c <= 20 {
-		fmt.Println(fibo.Num(c))
-	} else {
-		fmt.Println("Недопустимое значение")
+	var nums = []int{8, 19, -1, 22}
+	for _, n := range nums {
+		if 0 < n && n <= 20 {
+			fmt.Println(fibo.Num(n))
+		} else {
+			fmt.Println("Недопустимое значение")
+		}
 	}
 }
