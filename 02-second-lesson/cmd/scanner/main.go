@@ -27,21 +27,18 @@ func main() {
 	}
 }
 
-type pages = []crawler.Document
 type target struct {
 	url   string
 	depth int
 }
-
 type targets []target
 
-func (s targets) Scan() (pages, error) {
+func (s targets) Scan() ([]crawler.Document, error) {
 	service := spider.New()
-	var result pages
+	var result []crawler.Document
 	for _, v := range s {
 		res, _ := service.Scan(v.url, v.depth)
 		result = append(result, res...)
 	}
-
 	return result, nil
 }
