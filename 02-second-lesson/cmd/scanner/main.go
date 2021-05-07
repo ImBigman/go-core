@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"go-core/02-second-lesson/pkg/crawler"
 	"go-core/02-second-lesson/pkg/crawler/spider"
+	"log"
 	"strings"
 )
 
@@ -13,7 +14,7 @@ func main() {
 	flag.Parse()
 	fmt.Println("Ожидайте, идет сканирование целевых ресурсов.")
 	resources := targets{{"http://go.dev", 5}, {"http://golang.org", 2}}
-	res, _ := resources.Scan()
+	res := resources.Scan()
 	if *sFlag != "" {
 		fmt.Printf("Искомая строка: %s \n", *sFlag)
 		fmt.Println("Результат поиска:")
@@ -33,12 +34,16 @@ type target struct {
 }
 type targets []target
 
-func (s targets) Scan() ([]crawler.Document, error) {
+func (t targets) Scan() []crawler.Document {
 	service := spider.New()
 	var result []crawler.Document
-	for _, v := range s {
-		res, _ := service.Scan(v.url, v.depth)
+	for _, v := range t {
+		res, err := service.Scan(v.url, v.depth)
+		if err != nil {
+			log.Fatal(err)
+			return result
+		}
 		result = append(result, res...)
 	}
-	return result, nil
+	return result
 }
