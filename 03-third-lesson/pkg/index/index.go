@@ -8,88 +8,81 @@ import (
 	"strings"
 )
 
-func Make(d []crawler.Document) map[string][]int {
-	stringMap := make(map[string][]int)
-	var stringSlice []string
+// Используется для создания индекса типа -  "строка": [номера страниц, на которых она находится]
+func Make(d []crawler.Document) Index {
+	docIndex := make(Index)
 	var docs []Document
 	reg, err := regexp.Compile("[^a-zA-Z]+")
 	if err != nil {
 		log.Fatal(err)
 	}
 	for i, v := range d {
-		// у всех страниц удаляю символы и возвращаю только слова из URL и Title для создания индекса
+		// применяется для формирования совокупности слов из URL и Title - как ключи индекса
 		s := reg.ReplaceAllString(strings.ToLower(v.Title+" "+v.URL), " ")
 		docStrings := strings.Fields(s)
-		stringSlice = append(stringSlice, docStrings...)
-		stringSlice = uniqString(stringSlice)
-		// создаю карту индекса
+		// используется для формирования карты индекса из слов документа и его ID
 		for _, v := range docStrings {
-			stringMap[v] = append(stringMap[v], i)
+			docIndex[v] = append(docIndex[v], i)
 		}
-		// формирую слайс из документов нового типа данных
+		// применяется  для формирования слайса из документов нового типа данных
 		docs = append(docs, Document{i, v.URL, v.Title})
 	}
-	for k, v := range stringMap {
-		stringMap[k] = uniqInt(v)
+	// используется для формирования слайса уникальных ID страниц - как значение индекса
+	for k, v := range docIndex {
+		docIndex[k] = uniqInt(v)
 	}
 	Documents = docs
-	return stringMap
+	return docIndex
 }
-func Search(n []int, d []Document) []Document {
+
+func Search(n []int, d []Document) ([]Document, error) {
 	var result []Document
-	for _, v := range n {
-		res, err := binarySearch(d, v)
-		if err != nil {
-			log.Fatal(err)
+	if len(n) != 0 {
+		for _, v := range n {
+			res, err := binarySearch(d, v)
+			if err != nil {
+				return result, errors.New("Нет совпадений")
+			}
+			result = append(result, res)
 		}
-		result = append(result, res)
+	} else {
+		return result, errors.New("Совпадений не найдено")
 	}
-	return result
+	return result, nil
 }
 
 var Documents []Document
 
+type Index map[string][]int
 type Document struct {
 	ID    int
 	URL   string
 	Title string
 }
 
-// два метода для создания слайсов с уникальными значениями для строк и чисел
-func uniqString(stringSlice []string) []string {
-	keys := make(map[string]bool)
-	list := []string{}
-	for _, entry := range stringSlice {
-		if _, value := keys[entry]; !value {
-			keys[entry] = true
-			list = append(list, entry)
-		}
-	}
-	return list
-}
-
-func uniqInt(intSlice []int) []int {
+// для создания слайсов с уникальными значениями для чисел
+func uniqInt(slice []int) []int {
 	keys := make(map[int]bool)
-	list := []int{}
-	for _, entry := range intSlice {
+	res := []int{}
+	for _, entry := range slice {
 		if _, value := keys[entry]; !value {
 			keys[entry] = true
-			list = append(list, entry)
+			res = append(res, entry)
 		}
 	}
-	return list
+	return res
 }
 
-func binarySearch(d []Document, search int) (Document, error) {
+func binarySearch(d []Document, n int) (Document, error) {
 	hf := len(d) / 2
 	var result Document
 	switch {
 	case len(d) == 0:
 		return Document{}, errors.New("пустой список")
-	case d[hf].ID > search:
-		result, _ = binarySearch(d[:hf], search)
-	case d[hf].ID < search:
-		result, _ = binarySearch(d[hf+1:], search)
+	case d[hf].ID > n:
+		result, _ = binarySearch(d[:hf], n)
+	case d[hf].ID < n:
+		result, _ = binarySearch(d[hf+1:], n)
 	default:
 		result = d[hf]
 	}
