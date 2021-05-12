@@ -1,16 +1,26 @@
 package index
 
 import (
-	"errors"
 	"go-core/03-third-lesson/pkg/crawler"
 	"log"
 	"regexp"
 	"strings"
 )
 
+type Document struct {
+	ID    int
+	URL   string
+	Title string
+}
+
+type Data struct {
+	IndexDocs []Document
+	IndexMap  map[string][]int
+}
+
 // Используется для создания индекса типа -  "строка": [номера страниц, на которых она находится]
-func Make(d []crawler.Document) Index {
-	docIndex := make(Index)
+func Make(d []crawler.Document) Data {
+	docIndex := make(map[string][]int)
 	var docs []Document
 	reg, err := regexp.Compile("[^a-zA-Z]+")
 	if err != nil {
@@ -31,33 +41,20 @@ func Make(d []crawler.Document) Index {
 	for k, v := range docIndex {
 		docIndex[k] = uniqInt(v)
 	}
-	Documents = docs
-	return docIndex
+	index := Data{docs, docIndex}
+	return index
 }
 
-func Search(n []int, d []Document) ([]Document, error) {
+func (d Data) Search(s string) []Document {
 	var result []Document
-	if len(n) != 0 {
-		for _, v := range n {
-			res, err := binarySearch(d, v)
-			if err != nil {
-				return result, errors.New("Нет совпадений")
-			}
+	if len(d.IndexDocs) != 0 {
+		ran := d.IndexMap[s]
+		for _, v := range ran {
+			res := binSearch(d.IndexDocs, v)
 			result = append(result, res)
 		}
-	} else {
-		return result, errors.New("Совпадений не найдено")
 	}
-	return result, nil
-}
-
-var Documents []Document
-
-type Index map[string][]int
-type Document struct {
-	ID    int
-	URL   string
-	Title string
+	return result
 }
 
 // для создания слайсов с уникальными значениями для чисел
@@ -73,18 +70,23 @@ func uniqInt(slice []int) []int {
 	return res
 }
 
-func binarySearch(d []Document, n int) (Document, error) {
-	hf := len(d) / 2
+func binSearch(d []Document, n int) Document {
 	var result Document
-	switch {
-	case len(d) == 0:
-		return Document{}, errors.New("пустой список")
-	case d[hf].ID > n:
-		result, _ = binarySearch(d[:hf], n)
-	case d[hf].ID < n:
-		result, _ = binarySearch(d[hf+1:], n)
-	default:
-		result = d[hf]
+	start := 0
+	hf := len(d) / 2
+	end := len(d) - 1
+	for start <= end {
+		res := d[hf]
+		if res.ID == n {
+			return d[hf]
+		}
+		if res.ID > n {
+			end = hf - 1
+			hf = (start + end) / 2
+			continue
+		}
+		start = hf + 1
+		hf = (start + end) / 2
 	}
-	return result, nil
+	return result
 }
