@@ -58,11 +58,12 @@ func (l *List) Pop() *List {
 
 // Reverse разворачивает список.
 func (l *List) Reverse() *List {
-	list := New()
-	el := l.root.next
-	for el.Val != nil {
-		list.Push(*el)
-		el = el.next
+	current := l.root
+	var next, prev *Elem
+	for current != nil {
+		next, current.next = current.next, prev
+		prev, current = current, next
 	}
-	return list
+	l.root = prev
+	return l
 }
