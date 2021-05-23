@@ -5,27 +5,36 @@ import (
 	"go-core/05-fifth-lesson/pkg/crawler"
 	"io"
 	"io/ioutil"
-	"log"
 	"os"
 )
 
 const path = "./store/scan_result.txt"
 
+// Используется для записи данных в файл
 func Rec(docs []crawler.Document) (bool, error) {
 	f, err := os.Create(path)
-	catch(err)
+	if err != nil {
+		return false, err
+	}
 	defer f.Close()
 
 	data, err := json.Marshal(docs)
-	catch(err)
+	if err != nil {
+		return false, err
+	}
 	err = ioutil.WriteFile(f.Name(), data, 0666)
-	catch(err)
+	if err != nil {
+		return false, err
+	}
 	return true, err
 }
 
-func Exrtact() []crawler.Document {
+// для извлечение данных из имеющегося файла
+func Exrtact() ([]crawler.Document, error) {
 	f, err := os.Open(path)
-	catch(err)
+	if err != nil {
+		return nil, err
+	}
 	defer f.Close()
 
 	buf := make([]byte, 1024)
@@ -36,8 +45,7 @@ func Exrtact() []crawler.Document {
 			break
 		}
 		if err != nil {
-			log.Fatal(err)
-			continue
+			return nil, err
 		}
 		if n > 0 {
 			data = append(data, buf[:n]...)
@@ -45,18 +53,13 @@ func Exrtact() []crawler.Document {
 	}
 	var res []crawler.Document
 	json.Unmarshal([]byte(data), &res)
-	return res
+	return res, nil
 }
 
+// для проверки существования файла с данными
 func Empty() bool {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		return true
 	}
 	return false
-}
-
-func catch(e error) {
-	if e != nil {
-		log.Fatal(e)
-	}
 }

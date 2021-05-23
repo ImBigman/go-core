@@ -7,14 +7,16 @@ import (
 	"go-core/05-fifth-lesson/pkg/crawler/spider"
 	"go-core/05-fifth-lesson/pkg/index"
 	"go-core/05-fifth-lesson/pkg/storage"
-	"log"
 )
 
 func main() {
 	sFlag := flag.String("s", "", "поиск слов в ссылках после флага -s")
 	flag.Parse()
 	fmt.Println("Ожидайте, идет сканирование целевых ресурсов.")
-	res := source()
+	res, err := dataSource()
+	if err != nil {
+		fmt.Println("Ошибка при работе с файлом данных.")
+	}
 	ind := index.Make(res)
 	if *sFlag != "" {
 		fmt.Printf("Искомая строка: %s \n", *sFlag)
@@ -27,30 +29,31 @@ func main() {
 	}
 }
 
-func source() []crawler.Document {
+func dataSource() ([]crawler.Document, error) {
 	var data []crawler.Document
+	var err error
 	resources := map[int]string{5: "http://go.dev", 2: "http://golang.org"}
 	if storage.Empty() {
-		data = scan(resources)
+		data, err = scan(resources)
 	} else {
-		data = storage.Exrtact()
+		data, err = storage.Exrtact()
 	}
-	return data
+	return data, err
 }
 
-func scan(m map[int]string) []crawler.Document {
+func scan(m map[int]string) ([]crawler.Document, error) {
 	service := spider.New()
 	var result []crawler.Document
 	for k, v := range m {
 		res, err := service.Scan(v, k)
 		if err != nil {
-			log.Fatal(err)
-			return result
+			return result, err
 		}
 		result = append(result, res...)
 	}
 	if len(result) > 0 {
-		storage.Rec(result)
+		_, err := storage.Rec(result)
+		return result, err
 	}
-	return result
+	return result, nil
 }
