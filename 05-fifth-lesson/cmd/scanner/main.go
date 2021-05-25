@@ -7,13 +7,15 @@ import (
 	"go-core/05-fifth-lesson/pkg/crawler/spider"
 	"go-core/05-fifth-lesson/pkg/index"
 	"go-core/05-fifth-lesson/pkg/storage"
+	"log"
 )
 
 func main() {
 	sFlag := flag.String("s", "", "поиск слов в ссылках после флага -s")
 	flag.Parse()
 	fmt.Println("Ожидайте, идет сканирование целевых ресурсов.")
-	res, err := dataSource()
+	resources := map[int]string{5: "http://go.dev", 2: "http://golang.org"}
+	res, err := dataSource(resources)
 	if err != nil {
 		fmt.Println("Ошибка при работе с файлом данных.")
 	}
@@ -29,14 +31,16 @@ func main() {
 	}
 }
 
-func dataSource() ([]crawler.Document, error) {
+func dataSource(m map[int]string) ([]crawler.Document, error) {
 	var data []crawler.Document
 	var err error
-	resources := map[int]string{5: "http://go.dev", 2: "http://golang.org"}
 	if storage.Empty() {
-		data, err = scan(resources)
+		data, err = scan(m)
 	} else {
 		data, err = storage.Exrtact()
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 	return data, err
 }
