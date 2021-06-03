@@ -21,7 +21,7 @@ func main() {
 	}
 	ind := index.Make(res)
 	if *sFlag == "" {
-		fmt.Println("Вы не указали параметоров для поиска.")
+		fmt.Println("Вы не указали параметров поиска.")
 	}
 	if *sFlag != "" {
 		fmt.Printf("Искомая строка: %s \n", *sFlag)
