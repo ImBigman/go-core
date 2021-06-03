@@ -17,9 +17,12 @@ func main() {
 	resources := map[int]string{5: "http://go.dev", 2: "http://golang.org"}
 	res, err := dataSource(resources)
 	if err != nil {
-		fmt.Println("Ошибка при работе с файлом данных.")
+		log.Fatal(err)
 	}
 	ind := index.Make(res)
+	if *sFlag == "" {
+		fmt.Println("Вы не указали параметоров для поиска.")
+	}
 	if *sFlag != "" {
 		fmt.Printf("Искомая строка: %s \n", *sFlag)
 		fmt.Printf("Искомая строка содержится на %d страницах: %v \n", len(ind.IndexMap[*sFlag]), ind.IndexMap[*sFlag])
@@ -36,11 +39,9 @@ func dataSource(m map[int]string) ([]crawler.Document, error) {
 	var err error
 	if storage.Empty() {
 		data, err = scan(m)
-	} else {
+	}
+	if !storage.Empty() {
 		data, err = storage.Exrtact()
-		if err != nil {
-			log.Fatal(err)
-		}
 	}
 	return data, err
 }

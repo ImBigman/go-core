@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"go-core/05-fifth-lesson/pkg/crawler"
 	"io"
-	"io/ioutil"
 	"os"
 )
 
@@ -22,7 +21,7 @@ func Rec(docs []crawler.Document) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	err = ioutil.WriteFile(f.Name(), data, 0666)
+	err = os.WriteFile(f.Name(), data, 0666)
 	if err != nil {
 		return false, err
 	}
@@ -59,6 +58,13 @@ func Exrtact() ([]crawler.Document, error) {
 // для проверки существования файла с данными
 func Empty() bool {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
+		return true
+	}
+	fileInfo, err := os.Lstat(path)
+	if fileInfo.Size() == 0 {
+		return true
+	}
+	if err != nil {
 		return true
 	}
 	return false
