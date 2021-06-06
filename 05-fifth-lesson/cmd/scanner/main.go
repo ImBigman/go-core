@@ -15,7 +15,8 @@ func main() {
 	flag.Parse()
 	fmt.Println("Ожидайте, идет сканирование целевых ресурсов.")
 	resources := map[int]string{5: "http://go.dev", 2: "http://golang.org"}
-	res, err := dataSource(resources)
+	path := "./store/scan_result.txt"
+	res, err := dataSource(resources, path)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -34,30 +35,30 @@ func main() {
 	}
 }
 
-func dataSource(m map[int]string) ([]crawler.Document, error) {
+func dataSource(m map[int]string, path string) ([]crawler.Document, error) {
 	var data []crawler.Document
 	var err error
-	if storage.Empty() {
-		data, err = scan(m)
+	if storage.CheckStorage(path) {
+		return scan(m, path)
 	}
-	if !storage.Empty() {
-		data, err = storage.Exrtact()
+	if !storage.CheckStorage(path) {
+		return storage.Exrtact(path)
 	}
 	return data, err
 }
 
-func scan(m map[int]string) ([]crawler.Document, error) {
+func scan(m map[int]string, path string) ([]crawler.Document, error) {
 	service := spider.New()
 	var result []crawler.Document
 	for k, v := range m {
 		res, err := service.Scan(v, k)
 		if err != nil {
-			return result, err
+			return nil, err
 		}
 		result = append(result, res...)
 	}
 	if len(result) > 0 {
-		_, err := storage.Rec(result)
+		_, err := storage.Store(result, path)
 		return result, err
 	}
 	return result, nil

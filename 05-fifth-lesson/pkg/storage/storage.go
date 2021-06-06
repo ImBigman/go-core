@@ -7,10 +7,8 @@ import (
 	"os"
 )
 
-const path = "./store/scan_result.txt"
-
 // Используется для записи данных в файл
-func Rec(docs []crawler.Document) (bool, error) {
+func Store(docs []crawler.Document, path string) (bool, error) {
 	f, err := os.Create(path)
 	if err != nil {
 		return false, err
@@ -29,7 +27,7 @@ func Rec(docs []crawler.Document) (bool, error) {
 }
 
 // для извлечение данных из имеющегося файла
-func Exrtact() ([]crawler.Document, error) {
+func Exrtact(path string) ([]crawler.Document, error) {
 	f, err := os.Open(path)
 	if err != nil {
 		return nil, err
@@ -56,7 +54,7 @@ func Exrtact() ([]crawler.Document, error) {
 }
 
 // для проверки существования файла с данными
-func Empty() bool {
+func CheckStorage(path string) bool {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		return true
 	}
