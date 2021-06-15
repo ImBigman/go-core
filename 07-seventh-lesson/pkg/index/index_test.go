@@ -34,18 +34,6 @@ func TestData_Search(t *testing.T) {
 		{
 			name:   "Второй тест",
 			fields: fields{IndexDocs: docs, IndexMap: index},
-			args:   args{"url"},
-			want:   []Document{{3, "Url", "Go"}},
-		},
-		{
-			name:   "Третий тест",
-			fields: fields{IndexDocs: docs, IndexMap: index},
-			args:   args{"go"},
-			want:   []Document{{1, "Search", "Go"}, {2, "Dev", "Go"}, {3, "Url", "Go"}},
-		},
-		{
-			name:   "Четвертый тест",
-			fields: fields{IndexDocs: docs, IndexMap: index},
 			args:   args{"help"},
 			want:   nil,
 		},
